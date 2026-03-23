@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L&apos;IA, un outil au service de l&apos;enseignant — Module de formation</title>
+<!-- Polices système locales -->
+<style>
+  :root {
+    --ink: #0f0f14;
+    --paper: #f5f2eb;
+    --accent: #e85d26;
+    --accent2: #2563c4;
+    --muted: #7a7470;
+    --success: #1a7a4a;
+    --warn: #c47b0a;
+    --error: #c42020;
+    --card-bg: #faf8f4;
+    --border: #ddd9d0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, 'Liberation Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink);
+    display: flex; align-items: center; gap: 0;
+    border-bottom: 3px solid var(--accent);
+    overflow-x: auto;
+  }
+  .nav-brand {
+    padding: 14px 24px;
+    font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 800; font-size: 13px;
+    color: var(--paper);
+    white-space: nowrap;
+    border-right: 1px solid #333;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .nav-tab {
+    padding: 14px 18px;
+    font-size: 12px; font-weight: 500;
+    color: #aaa;
+    cursor: pointer; border: none; background: none;
+    white-space: nowrap;
+    transition: all .2s;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    position: relative;
+  }
+  .nav-tab:hover { color: var(--paper); }
+  .nav-tab.active { color: var(--accent); }
+  .nav-tab.active::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: var(--accent);
+  }
+  .nav-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #333; color: #888;
+    font-size: 10px; font-weight: 700;
+    margin-right: 6px;
+  }
+  .nav-tab.active .nav-num { background: var(--accent); color: white; }
+  .nav-tab.done .nav-num { background: var(--success); color: white; }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:none } }
+
+  /* HEADINGS */
+  .section-header { margin-bottom: 36px; }
+  .section-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent);
+    border: 1.5px solid var(--accent); padding: 3px 10px;
+    margin-bottom: 12px;
+  }
+  h1 { font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size: clamp(28px,5vw,44px); font-weight: 800; line-height: 1.1; }
+  h2 { font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+  h3 { font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+  .lead { font-size: 16px; color: var(--muted); margin-top: 12px; max-width: 600px; }
+
+  /* CARDS */
+  .card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-accent { border-left: 4px solid var(--accent); }
+  .card-blue { border-left: 4px solid var(--accent2); }
+  .card-green { border-left: 4px solid var(--success); }
+
+  /* NOTION CARDS */
+  .notion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .notion-card {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .notion-card::before {
+    content: attr(data-icon);
+    position: absolute; top: -8px; right: 10px;
+    font-size: 56px; opacity: 0.1;
+  }
+  .notion-card h3 { color: var(--accent); margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .notion-card p { font-size: 13px; color: #ccc; line-height: 1.5; }
+
+  .principe-list { list-style: none; }
+  .principe-list li {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .principe-list li:last-child { border-bottom: none; }
+  .principe-num {
+    font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 800; font-size: 22px;
+    color: var(--accent); min-width: 32px; line-height: 1;
+  }
+  .principe-list strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .principe-list span { font-size: 13px; color: var(--muted); }
+
+  /* PROMPT DISPLAY */
+  .prompt-box {
+    background: #1a1a2e;
+    color: #e0e0f0;
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 8px 0;
+    position: relative;
+    border-left: 3px solid var(--accent2);
+  }
+  .prompt-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin-bottom: 6px; font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;
+  }
+  .result-box {
+    background: #f0f7f0;
+    border: 1.5px solid #b8dbb8;
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 8px 0;
+    position: relative;
+  }
+  .quality-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .q-excellent { background: #d4f0dc; color: var(--success); }
+  .q-moyen { background: #fef3cd; color: var(--warn); }
+  .q-faible { background: #fde8e8; color: var(--error); }
+
+  /* ASSOCIATION ACTIVITY */
+  .asso-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:640px) { .asso-grid { grid-template-columns: 1fr; } }
+  
+  .asso-col h3 { margin-bottom: 12px; }
+  
+  .draggable-item, .drop-zone {
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    cursor: grab;
+    transition: all .2s;
+    user-select: none;
+  }
+  .draggable-item {
+    background: #1a1a2e; color: #e0e0f0;
+    border: 1.5px solid #3a3a6e;
+    font-family: 'Courier New', 'Consolas', monospace;
+    line-height: 1.5;
+  }
+  .draggable-item:active { cursor: grabbing; opacity: 0.6; }
+  .draggable-item.dragging { opacity: 0.4; }
+  
+  .drop-zone {
+    background: var(--card-bg);
+    border: 2px dashed var(--border);
+    min-height: 60px;
+    display: flex; flex-direction: column; justify-content: flex-start;
+  }
+  .drop-zone.over { border-color: var(--accent2); background: #eef3ff; }
+  .drop-zone.correct { border-color: var(--success); background: #f0f9f4; border-style: solid; }
+  .drop-zone.wrong { border-color: var(--error); background: #fef2f2; border-style: solid; }
+  
+  .drop-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .drop-result-text { font-size: 13px; line-height: 1.5; }
+
+  /* PROMPT À TROUS */
+  .mad-lib {
+    background: #1a1a2e; color: #e0e0f0;
+    border-radius: 4px; padding: 20px 22px;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 13px; line-height: 2.2;
+    margin-bottom: 20px;
+  }
+  .blank {
+    display: inline-block; position: relative;
+  }
+  .blank select {
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 13px;
+    background: var(--accent);
+    color: white;
+    border: none; border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
+    min-width: 120px;
+  }
+  .blank select:focus { outline: 2px solid var(--accent2); }
+
+  /* BOUTONS */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px;
+    font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em;
+    border: 2px solid; border-radius: 3px;
+    cursor: pointer; transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-primary:hover { background: #c94d1a; border-color: #c94d1a; }
+  .btn-outline { background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn-outline:hover { background: var(--ink); color: var(--paper); }
+  .btn-sm { padding: 7px 14px; font-size: 11px; }
+
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+
+  /* FEEDBACK */
+  .feedback-block {
+    display: none;
+    padding: 14px 16px; border-radius: 4px;
+    font-size: 13px; margin-top: 16px;
+  }
+  .feedback-block.visible { display: block; animation: fadeIn .3s ease; }
+  .feedback-ok { background: #d4f0dc; border-left: 4px solid var(--success); }
+  .feedback-ko { background: #fde8e8; border-left: 4px solid var(--error); }
+  .feedback-info { background: #e8eeff; border-left: 4px solid var(--accent2); }
+
+  /* SCORE */
+  .score-bar {
+    height: 8px; background: var(--border); border-radius: 4px;
+    overflow: hidden; margin: 8px 0;
+  }
+  .score-fill {
+    height: 100%; background: var(--success); border-radius: 4px;
+    transition: width .5s ease;
+  }
+
+  /* QUIZ MCQ */
+  .mcq-option {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border: 1.5px solid var(--border);
+    border-radius: 4px; margin-bottom: 8px;
+    cursor: pointer; transition: all .15s;
+    font-size: 13px;
+  }
+  .mcq-option:hover { border-color: var(--accent2); background: #eef3ff; }
+  .mcq-option.selected { border-color: var(--accent2); background: #eef3ff; }
+  .mcq-option.correct { border-color: var(--success); background: #f0f9f4; }
+  .mcq-option.wrong { border-color: var(--error); background: #fef2f2; }
+  .mcq-letter {
+    min-width: 24px; height: 24px;
+    background: var(--border); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+  }
+  .mcq-option.selected .mcq-letter { background: var(--accent2); color: white; }
+  .mcq-option.correct .mcq-letter { background: var(--success); color: white; }
+
+  /* ANALYSE COMPARATIVE */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:600px) { .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card { border-radius: 4px; overflow: hidden; border: 1.5px solid var(--border); }
+  .compare-head { padding: 10px 14px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .compare-head.bad { background: #fde8e8; color: var(--error); }
+  .compare-head.good { background: #d4f0dc; color: var(--success); }
+  .compare-body { padding: 14px; font-size: 13px; line-height: 1.6; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { margin-bottom: 32px; }
+  .progress-steps { display: flex; gap: 4px; }
+  .progress-step {
+    flex: 1; height: 4px; background: var(--border); border-radius: 2px;
+    transition: background .3s;
+  }
+  .progress-step.done { background: var(--success); }
+  .progress-step.active { background: var(--accent); }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: var(--ink); color: var(--paper); padding: 10px 12px; text-align: left; font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: #f8f5f0; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 2px; font-size: 11px; font-weight: 600;
+  }
+  .tag-r { background: #fde8e8; color: var(--error); }
+  .tag-g { background: #d4f0dc; color: var(--success); }
+  .tag-y { background: #fef3cd; color: var(--warn); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* RECAP FINAL */
+  .recap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; margin-bottom: 32px; }
+  .recap-stat { background: var(--ink); color: var(--paper); padding: 20px 16px; border-radius: 4px; text-align: center; }
+  .recap-stat-n { font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); }
+  .recap-stat-l { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+  .annotation {
+    font-size: 12px; color: var(--muted); font-style: italic; margin-top: 6px;
+  }
+
+  .highlight { background: rgba(232,93,38,0.12); padding: 1px 4px; border-radius: 2px; }
+
+  /* Tooltip */
+  [data-tip] { position: relative; cursor: help; border-bottom: 1px dashed var(--accent); }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 0;
+    background: var(--ink); color: var(--paper);
+    padding: 6px 10px; border-radius: 4px;
+    font-size: 12px; white-space: nowrap; z-index: 10;
+    font-style: normal; border-bottom: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+</style>
+<style>
+/* Extensions spécifiques à ce module */
+.usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.usage-card {
+  border: 1.5px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+  background: var(--card-bg);
+  transition: box-shadow .2s;
+}
+.usage-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.usage-head {
+  padding: 12px 14px;
+  font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+}
+.usage-body { padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.55; }
+.usage-body ul { list-style: none; }
+.usage-body ul li::before { content: "→ "; color: var(--accent); font-weight: 700; }
+.usage-body ul li { margin-bottom: 5px; }
+
+.positionnement-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0; margin-bottom: 24px;
+  border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden;
+}
+@media(max-width:600px) { .positionnement-grid { grid-template-columns: 1fr; } }
+.pos-col { padding: 20px; }
+.pos-col:first-child { border-right: 1.5px solid var(--border); }
+.pos-col h3 { margin-bottom: 12px; font-size: 14px; }
+.pos-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.pos-item:last-child { border-bottom: none; }
+.pos-icon { font-size: 16px; min-width: 20px; }
+
+.cas-card {
+  border: 1.5px solid var(--border); border-radius: 4px;
+  overflow: hidden; margin-bottom: 20px;
+}
+.cas-header {
+  padding: 14px 18px;
+  background: var(--ink); color: var(--paper);
+  display: flex; align-items: center; gap: 12px;
+}
+.cas-header .discipline {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid var(--accent); padding: 2px 8px; border-radius: 2px;
+}
+.cas-header h3 { font-size: 15px; margin-bottom: 0; }
+.cas-body { padding: 18px; }
+.cas-scenario {
+  background: #f0f4ff; border-left: 3px solid var(--accent2);
+  padding: 12px 14px; font-size: 13px; line-height: 1.6;
+  border-radius: 0 4px 4px 0; margin-bottom: 14px;
+  font-style: italic;
+}
+.cas-valeur {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.cas-tag {
+  background: var(--ink); color: var(--paper);
+  font-size: 11px; font-weight: 600; padding: 4px 10px;
+  border-radius: 20px; letter-spacing: 0.04em;
+}
+
+.vf-item {
+  border: 1.5px solid var(--border); border-radius: 4px;
+  padding: 14px 16px; margin-bottom: 10px;
+  font-size: 13px; line-height: 1.5;
+}
+.vf-buttons { display: flex; gap: 8px; margin-top: 10px; }
+.vf-btn {
+  padding: 6px 18px; border-radius: 3px; border: 1.5px solid;
+  font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; font-size: 11px;
+  text-transform: uppercase; cursor: pointer; transition: all .15s;
+}
+.vf-btn.vrai { color: var(--success); border-color: var(--success); background: transparent; }
+.vf-btn.faux { color: var(--error); border-color: var(--error); background: transparent; }
+.vf-btn.vrai:hover, .vf-btn.vrai.active { background: var(--success); color: white; }
+.vf-btn.faux:hover, .vf-btn.faux.active { background: var(--error); color: white; }
+.vf-feedback { display:none; margin-top:10px; padding: 8px 12px; border-radius:4px; font-size:12px; }
+.vf-feedback.visible { display:block; }
+.vf-ok { background:#d4f0dc; color: var(--success); }
+.vf-ko { background:#fde8e8; color: var(--error); }
+
+.thermometre-wrap {
+  background: var(--ink); border-radius: 4px; padding: 24px;
+  margin-bottom: 24px;
+}
+.thermo-question {
+  color: var(--paper); font-size: 14px; line-height: 1.5;
+  margin-bottom: 16px; font-weight: 500;
+}
+.thermo-scale {
+  display: flex; gap: 0; border-radius: 4px; overflow: hidden;
+  margin-bottom: 8px;
+}
+.thermo-opt {
+  flex: 1; text-align: center; padding: 10px 4px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: all .15s; color: white; opacity: 0.5;
+  font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.thermo-opt:hover { opacity: 0.85; }
+.thermo-opt.selected { opacity: 1; }
+.thermo-opt.t1 { background: #c42020; }
+.thermo-opt.t2 { background: #c47b0a; }
+.thermo-opt.t3 { background: #666; }
+.thermo-opt.t4 { background: #2563c4; }
+.thermo-opt.t5 { background: #1a7a4a; }
+.thermo-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: #aaa; margin-top: 4px;
+}
+
+.scenario-tabs {
+  display: flex; gap: 0; border-bottom: 2px solid var(--border);
+  margin-bottom: 20px; overflow-x: auto;
+}
+.scenario-tab {
+  padding: 10px 18px; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  cursor: pointer; border: none; background: none;
+  color: var(--muted); white-space: nowrap;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  transition: all .15s;
+}
+.scenario-tab:hover { color: var(--ink); }
+.scenario-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.scenario-content { display: none; }
+.scenario-content.active { display: block; animation: fadeIn .2s ease; }
+
+.limit-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin-bottom: 20px;
+}
+@media(max-width:580px) { .limit-grid { grid-template-columns: 1fr; } }
+.limit-card {
+  border-radius: 4px; padding: 16px;
+  border: 1.5px solid var(--border); background: var(--card-bg);
+}
+.limit-icon { font-size: 24px; margin-bottom: 8px; }
+.limit-title { font-family: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+.limit-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.annotation { font-size:12px; color:var(--muted); font-style:italic; margin-top:6px; }
+table { width:100%; border-collapse:collapse; margin:16px 0; font-size:13px; }
+th { background:var(--ink); color:var(--paper); padding:10px 12px; text-align:left; font-family:'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Arial, sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; }
+td { padding:10px 12px; border-bottom:1px solid var(--border); }
+tr:nth-child(even) td { background:#f8f5f0; }
+hr { border:none; border-top:1px solid var(--border); margin:28px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">IAG &amp; Enseignement</div>
+  <button class="nav-tab active" onclick="goTo(0)" id="tab0"><span class="nav-num">1</span>Qu&apos;est-ce que l&apos;IAG ?</button>
+  <button class="nav-tab" onclick="goTo(1)" id="tab1"><span class="nav-num">2</span>Idées reçues</button>
+  <button class="nav-tab" onclick="goTo(2)" id="tab2"><span class="nav-num">3</span>Cas d&apos;usage</button>
+  <button class="nav-tab" onclick="goTo(3)" id="tab3"><span class="nav-num">4</span>Plus-values</button>
+  <button class="nav-tab" onclick="goTo(4)" id="tab4"><span class="nav-num">5</span>Limites</button>
+  <button class="nav-tab" onclick="goTo(5)" id="tab5"><span class="nav-num">6</span>Posture</button>
+  <button class="nav-tab" onclick="goTo(6)" id="tab6"><span class="nav-num">7</span>Activités</button>
+  <button class="nav-tab" onclick="goTo(7)" id="tab7"><span class="nav-num">8</span>Bilan</button>
+</nav>
+
+<main>
+
+<!-- ===== MODULE 1 : QU'EST-CE QUE L'IAG ? ===== -->
+<div class="section active" id="s0">
+  <div class="section-header">
+    <div class="section-tag">Module 1 — Savoirs notionnels</div>
+    <h1>Comprendre l&apos;IAG</h1>
+    <p class="lead">Avant de l&apos;utiliser, comprendre ce qu&apos;elle est — et ce qu&apos;elle n&apos;est pas.</p>
+  </div>
+
+  <div class="card card-blue">
+    <h3>🔑 Définition de travail</h3>
+    <p style="font-size:14px; line-height:1.7; margin-bottom:12px;">
+      Une <strong>IA générative (IAG)</strong> est un programme informatique entraîné sur d&apos;immenses quantités de textes pour <strong>prédire et produire du texte vraisemblable</strong> en réponse à une instruction. Elle ne « comprend » pas au sens humain : elle calcule des probabilités sur les mots les plus pertinents à produire, compte tenu du contexte fourni.
+    </p>
+    <p style="font-size:13px; color:var(--muted);">
+      Exemples d&apos;IAG grand public : ChatGPT (OpenAI), Gemini (Google), Le Chat de Mistral (solution française recommandée pour les usages scolaires), Claude (Anthropic), Copilot (Microsoft).
+    </p>
+  </div>
+
+  <h2>3 grands principes</h2>
+  <div class="card">
+    <ul class="principe-list">
+      <li>
+        <div class="principe-num">01</div>
+        <div>
+          <strong>Entraînement sur des données massives</strong>
+          <span>L&apos;IAG a "lu" des milliards de documents : livres, articles, pages web, forums. Elle a appris des patterns statistiques du langage, mais pas de règles explicites.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num">02</div>
+        <div>
+          <strong>Le modèle de langage prédit le mot suivant</strong>
+          <span>À chaque étape, l&apos;IAG calcule quel mot (ou token) a la plus forte probabilité d&apos;apparaître compte tenu de ce qui précède. C&apos;est ce mécanisme qui produit du texte cohérent.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num">03</div>
+        <div>
+          <strong>Elle peut se tromper avec assurance</strong>
+          <span>L&apos;IAG produit du texte <em>vraisemblable</em>, pas nécessairement <em>exact</em>. Elle peut inventer des références, des dates, des citations — c&apos;est ce qu&apos;on appelle les <b>hallucinations</b>. Vérifier reste indispensable.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <h2>IAG vs. moteur de recherche : quelles différences ?</h2>
+  <div class="card">
+    <table>
+      <tr><th>Dimension</th><th>Moteur de recherche</th><th>IA générative</th></tr>
+      <tr><td><strong>Ce qu&apos;il produit</strong></td><td>Des liens vers des sources existantes</td><td>Un texte nouveau généré à la demande</td></tr>
+      <tr><td><strong>Vérifiabilité</strong></td><td>Source citée, vérifiable directement</td><td>Source souvent absente ou inventée</td></tr>
+      <tr><td><strong>Interaction</strong></td><td>Requête → liste de résultats</td><td>Dialogue itératif, affinable</td></tr>
+      <tr><td><strong>Personnalisation</strong></td><td>Faible (suggestions, historique)</td><td>Forte : on adapte niveau, format, ton</td></tr>
+      <tr><td><strong>Usage pédagogique</strong></td><td>Recherche documentaire, veille</td><td>Création, transformation, différenciation</td></tr>
+    </table>
+  </div>
+
+  <div class="card card-accent">
+    <h3>⚠️ Le point de vigilance fondamental</h3>
+    <p style="font-size:13px; line-height:1.7;">
+      L&apos;IA générative est un <strong>outil de production de texte vraisemblable</strong>, pas une encyclopédie fiable. Pour tout usage en classe — et a fortiori sur des sujets factuels (histoire, sciences, dates, lois) — <strong>la vérification par l&apos;enseignant reste obligatoire</strong> avant toute diffusion aux élèves.
+    </p>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="goTo(1)">Suivant : Idées reçues ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 2 : IDÉES REÇUES ===== -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-tag">Module 2 — Activité : Vrai / Faux</div>
+    <h1>Idées reçues sur l&apos;IA</h1>
+    <p class="lead">Testez vos représentations initiales. Pour chaque affirmation, répondez Vrai ou Faux avant de découvrir l&apos;explication.</p>
+  </div>
+
+  <div id="vf1" class="vf-item">
+    <strong>« L&apos;IA sait tout et ne se trompe jamais. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(1,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(1,'faux')">Faux</button>
+    </div>
+    <div id="vf1_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf2" class="vf-item">
+    <strong>« Utiliser l&apos;IA pour préparer mes cours, c&apos;est tricher. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(2,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(2,'faux')">Faux</button>
+    </div>
+    <div id="vf2_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf3" class="vf-item">
+    <strong>« L&apos;IA peut remplacer l&apos;enseignant à terme. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(3,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(3,'faux')">Faux</button>
+    </div>
+    <div id="vf3_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf4" class="vf-item">
+    <strong>« L&apos;IA comprend les élèves et adapte automatiquement le contenu à leur profil. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(4,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(4,'faux')">Faux</button>
+    </div>
+    <div id="vf4_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf5" class="vf-item">
+    <strong>« Ce que je partage à une IAG peut être utilisé pour entraîner d&apos;autres modèles. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(5,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(5,'faux')">Faux</button>
+    </div>
+    <div id="vf5_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf6" class="vf-item">
+    <strong>« L&apos;IA produit le même résultat si on lui pose la même question deux fois. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(6,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(6,'faux')">Faux</button>
+    </div>
+    <div id="vf6_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf7" class="vf-item">
+    <strong>« L&apos;IA peut m&apos;aider à gagner du temps sur des tâches répétitives comme la création d&apos;exercices. »</strong>
+    <div class="vf-buttons">
+      <button class="vf-btn vrai" onclick="answerVF(7,'vrai')">Vrai</button>
+      <button class="vf-btn faux" onclick="answerVF(7,'faux')">Faux</button>
+    </div>
+    <div id="vf7_fb" class="vf-feedback"></div>
+  </div>
+
+  <div id="vf_score" class="feedback-block" style="margin-top:20px;"></div>
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(0)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(2)">Suivant : Cas d&apos;usage ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 3 : CAS D'USAGE ===== -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-tag">Module 3 — Savoirs notionnels</div>
+    <h1>L&apos;IAG dans la pratique enseignante</h1>
+    <p class="lead">Six grandes familles d&apos;usages, illustrées par des exemples concrets pour chaque niveau.</p>
+  </div>
+
+  <div class="usage-grid">
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#e8f0fe; color:#1a3a8f;">
+        <span style="font-size:22px;">✍️</span>
+        <div>Création de supports</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Rédiger une fiche de cours structurée</li>
+          <li>Générer un texte de lecture inédit (évite le droit d&apos;auteur)</li>
+          <li>Créer une situation-problème en maths</li>
+          <li>Proposer un texte de départ pour une séance d&apos;écriture</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#fef3e8; color:#7a3800;">
+        <span style="font-size:22px;">🔢</span>
+        <div>Création d&apos;exercices</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Générer des séries de QCM sur un thème</li>
+          <li>Créer des exercices de difficulté progressive</li>
+          <li>Produire des variantes d&apos;un même exercice</li>
+          <li>Concevoir des exercices avec corrigé intégré</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#e8f8ef; color:#0a5230;">
+        <span style="font-size:22px;">🔀</span>
+        <div>Différenciation pédagogique</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Réécrire une consigne en 3 niveaux de difficulté</li>
+          <li>Simplifier un texte pour des élèves DYS</li>
+          <li>Enrichir une activité pour les élèves avancés</li>
+          <li>Adapter le vocabulaire au niveau de classe</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#fce8e8; color:#7a0a0a;">
+        <span style="font-size:22px;">📋</span>
+        <div>Évaluation &amp; feedback</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Rédiger une grille de critères d&apos;évaluation</li>
+          <li>Créer un corrigé-type avec barème</li>
+          <li>Générer des commentaires-types d&apos;appréciations</li>
+          <li>Préparer des questions de remédiation</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#f0e8fe; color:#3a0a7a;">
+        <span style="font-size:22px;">📝</span>
+        <div>Tâches administratives</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Rédiger un compte-rendu de réunion</li>
+          <li>Formuler des appréciations de bulletins</li>
+          <li>Préparer un courrier aux familles</li>
+          <li>Structurer un projet pédagogique écrit</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="usage-card">
+      <div class="usage-head" style="background:#e8fef8; color:#0a5a40;">
+        <span style="font-size:22px;">🔍</span>
+        <div>Veille &amp; préparation</div>
+      </div>
+      <div class="usage-body">
+        <ul>
+          <li>Obtenir un résumé d&apos;une notion disciplinaire</li>
+          <li>Trouver des analogies ou exemples concrets</li>
+          <li>Explorer les erreurs fréquentes des élèves</li>
+          <li>Générer une bibliographie de départ (à vérifier)</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>Exemples concrets par niveau et discipline</h2>
+
+  <div class="scenario-tabs">
+    <button class="scenario-tab active" onclick="showScenario('primaire')">🏫 École primaire</button>
+    <button class="scenario-tab" onclick="showScenario('college')">🏛️ Collège</button>
+    <button class="scenario-tab" onclick="showScenario('lycee')">🎓 Lycée</button>
+  </div>
+
+  <div class="scenario-content active" id="sc-primaire">
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">CP — Français</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Générer un texte de lecture inédit</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Création de supports</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">La maîtresse de CP travaille sur le son [in]. Elle a besoin d&apos;un texte court d&apos;une dizaine de lignes, avec des mots contenant ce son, compréhensible par des enfants de 6 ans, sur le thème de l&apos;hiver. Elle demande à l&apos;IA de le générer.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">⏱ Gain de temps</span>
+          <span class="cas-tag">🎯 Texte sur mesure</span>
+          <span class="cas-tag">©️ Pas de droit d&apos;auteur</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : obtenir un texte parfaitement calibré (fréquence du son, longueur de phrases, thème) en quelques secondes, sans chercher dans des manuels.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">CM2 — Mathématiques</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Différencier des problèmes de calcul</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Différenciation pédagogique</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Un professeur des écoles a un problème de divisions posées dans son manuel. Il veut trois versions : une simplifiée (nombres entiers petits), une standard (celle du manuel), une enrichie (avec nombres décimaux). Il copie le problème original et demande à l&apos;IA les deux variantes.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">🔀 Différenciation</span>
+          <span class="cas-tag">⏱ Gain de temps</span>
+          <span class="cas-tag">📐 Cohérence disciplinaire</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : obtenir 3 niveaux cohérents en partant d&apos;un seul problème source, sans repenser la logique mathématique de zéro.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">CE1 — Découverte du monde</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Créer des questions de compréhension après lecture</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Création d&apos;exercices</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Après une lecture documentaire sur les abeilles, l&apos;enseignante veut 5 questions progressives : 2 questions littérales, 2 questions inférées, 1 question de jugement. Elle colle le texte dans l&apos;IA et demande les questions avec corrigé.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">📚 Progression taxonomique</span>
+          <span class="cas-tag">✅ Corrigé intégré</span>
+          <span class="cas-tag">⏱ Gain de temps</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : l&apos;IA construit les questions directement à partir du texte fourni, garantissant leur pertinence par rapport au contenu réel.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="scenario-content" id="sc-college">
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">5e — Histoire-Géographie</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Générer une trace écrite différenciée</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Différenciation pédagogique</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Un professeur d&apos;histoire termine une séquence sur l&apos;Islam médiéval. Il a une classe très hétérogène. Il veut une trace écrite version standard (200 mots) et une version allégée (120 mots, phrases simples) pour les élèves en difficulté. Il rédige la version standard et demande à l&apos;IA de produire la version simplifiée.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">🔀 Différenciation</span>
+          <span class="cas-tag">♿ Inclusion</span>
+          <span class="cas-tag">⏱ Gain de temps</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : l&apos;enseignant garde la maîtrise du contenu (c&apos;est son texte source) et délègue à l&apos;IA la transformation formelle.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">4e — Mathématiques</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Varier les contextes d&apos;exercices sur un même thème</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Création d&apos;exercices</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Un professeur travaille sur les proportionnalités. Il a déjà des exercices classiques. Il veut diversifier les contextes pour motiver : exercices avec des données sportives, musicales, culinaires. Il demande à l&apos;IA 6 problèmes de proportionnalité dans des contextes variés pour des 4e.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">💡 Motivation</span>
+          <span class="cas-tag">🌍 Contextualisation</span>
+          <span class="cas-tag">🔢 Variété</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : diversifier les contextes sans avoir à chercher soi-même les données numériques cohérentes pour chaque situation.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">3e — Français</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Préparer des appréciations de bulletins</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Tâches administratives</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">En fin de trimestre, un professeur de français doit rédiger 28 appréciations. Il a noté pour chaque élève 2 ou 3 mots-clés (ex. : "participe bien, oral fort, écrit à améliorer"). Il donne ces mots-clés à l&apos;IA et lui demande de formuler une appréciation bienveillante et précise de 2 lignes.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">⏱ Gain de temps majeur</span>
+          <span class="cas-tag">✍️ Formulation soignée</span>
+          <span class="cas-tag">🧑‍🏫 Personnalisation</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : l&apos;enseignant reste maître du fond (ses observations), l&apos;IA l&apos;aide sur la forme. Il relit et ajuste chaque appréciation avant de la valider.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="scenario-content" id="sc-lycee">
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">Seconde — SVT</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Créer une situation-problème d&apos;accroche</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Création de supports</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Un professeur de SVT commence une séquence sur la génétique. Il veut une situation-problème ancrée dans l&apos;actualité scientifique, qui suscite une question de recherche. Il demande à l&apos;IA une accroche narrative de 150 mots sur les maladies génétiques rares, accessible à des élèves de Seconde, avec une question ouverte finale.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">🔍 Questionnement</span>
+          <span class="cas-tag">💡 Motivation</span>
+          <span class="cas-tag">🧪 Ancrage scientifique</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : obtenir rapidement plusieurs versions d&apos;accroche pour choisir celle qui correspond le mieux au profil de la classe.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">Terminale — Philosophie</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Explorer les arguments d&apos;une notion</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Veille &amp; préparation</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Avant de préparer sa séquence sur la notion de "Justice", un professeur de philosophie demande à l&apos;IA de lister les principales thèses et contre-thèses des auteurs au programme (Platon, Rawls, Aristote) avec une reformulation accessible pour des élèves de Terminale. Il utilise cela comme trame de révision de ses propres notes.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">📚 Synthèse rapide</span>
+          <span class="cas-tag">🧠 Aide à la préparation</span>
+          <span class="cas-tag">⚠️ À vérifier</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Attention : l&apos;IA peut déformer ou inventer des citations de philosophes. Ce résultat sert de trame à relire, pas de source citée directement aux élèves.</p>
+      </div>
+    </div>
+    <div class="cas-card">
+      <div class="cas-header">
+        <span class="discipline">1re — Anglais</span>
+        <div>
+          <h3 style="color:white; margin-bottom:2px;">Générer des documents déclencheurs variés</h3>
+          <div style="font-size:12px; color:#aaa;">Usage : Création de supports</div>
+        </div>
+      </div>
+      <div class="cas-body">
+        <div class="cas-scenario">Une professeure d&apos;anglais travaille sur l&apos;axe "Identités et échanges". Elle veut 3 courts dialogues authentiques (15-20 répliques) entre personnages de cultures différentes, de niveau B1-B2, pouvant servir de base à une activité de compréhension de l&apos;oral. Elle précise les situations et les registres souhaités.</div>
+        <div class="cas-valeur">
+          <span class="cas-tag">🌍 Authenticité simulée</span>
+          <span class="cas-tag">©️ Pas de droits</span>
+          <span class="cas-tag">🎯 Niveau calibré</span>
+        </div>
+        <p style="font-size:13px; color:var(--muted);">Plus-value : créer des supports sur mesure (niveau, thème, registre, longueur) sans dépendre des manuels ni des droits de reproduction.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(1)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Suivant : Plus-values ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 4 : PLUS-VALUES ===== -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <div class="section-tag">Module 4 — Savoirs notionnels</div>
+    <h1>Les plus-values réelles de l&apos;IAG pour l&apos;enseignant</h1>
+    <p class="lead">Comment en tirer parti sans y perdre son identité professionnelle ?</p>
+  </div>
+
+  <div class="card card-green">
+    <h3>📌 Principe central</h3>
+    <p style="font-size:14px; line-height:1.7;">
+      L&apos;IAG ne remplace pas le jugement pédagogique de l&apos;enseignant. Elle <strong>accélère et diversifie la production</strong> de ressources, libérant du temps pour ce qui est irremplaçable : la relation avec les élèves, l&apos;observation fine des apprentissages, l&apos;adaptation en temps réel en classe.
+    </p>
+  </div>
+
+  <h2>Les 5 plus-values majeures</h2>
+  <div class="card">
+    <ul class="principe-list">
+      <li>
+        <div class="principe-num" style="color:var(--success);">⏱</div>
+        <div>
+          <strong>Gain de temps sur les tâches chronophages</strong>
+          <span>Rédiger 30 exercices variés, 28 appréciations de bulletin, ou une fiche de révision prend des heures. L&apos;IA produit un premier jet en quelques secondes, que l&apos;enseignant relit, corrige et valide. Le temps gagné peut être réinvesti dans la relation pédagogique.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num" style="color:var(--accent2);">🔀</div>
+        <div>
+          <strong>Facilitation de la différenciation</strong>
+          <span>Produire plusieurs versions d&apos;une même consigne ou d&apos;un même texte (niveaux de difficulté, aide pour élèves DYS, enrichissement pour élèves avancés) sans repartir de zéro à chaque fois.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num" style="color:var(--accent);">🎨</div>
+        <div>
+          <strong>Diversification des contenus et des contextes</strong>
+          <span>Varier les situations d&apos;apprentissage, les thèmes d&apos;exercices, les types de textes — sans être limité par les ressources disponibles dans les manuels ou soumis aux droits de reproduction.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num" style="color:var(--warn);">🧪</div>
+        <div>
+          <strong>Exploration pédagogique rapide</strong>
+          <span>Tester une approche, un angle d&apos;explication, une analogie, un exemple concret — sans investir des heures de recherche. L&apos;IA offre un « brouillon intellectuel » que l&apos;enseignant peut rejeter ou développer.</span>
+        </div>
+      </li>
+      <li>
+        <div class="principe-num" style="color:var(--muted);">📝</div>
+        <div>
+          <strong>Amélioration de la forme rédactionnelle</strong>
+          <span>Reformuler une consigne peu claire, trouver un meilleur titre, améliorer la formulation d&apos;une appréciation ou d&apos;un courrier — l&apos;IA est un correcteur et rédacteur disponible à toute heure.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <h2>Ce que l&apos;IA ne remplace PAS</h2>
+  <div class="positionnement-grid card" style="padding:0; overflow:hidden;">
+    <div class="pos-col">
+      <h3 style="color:var(--success);">✅ L&apos;IA peut aider à...</h3>
+      <div class="pos-item"><span class="pos-icon">✍️</span><span>Produire une première version de ressources</span></div>
+      <div class="pos-item"><span class="pos-icon">🔄</span><span>Reformuler, simplifier, enrichir un texte</span></div>
+      <div class="pos-item"><span class="pos-icon">📋</span><span>Générer des grilles, des corrigés-types</span></div>
+      <div class="pos-item"><span class="pos-icon">🔢</span><span>Varier les exercices sur un même objectif</span></div>
+      <div class="pos-item"><span class="pos-icon">📝</span><span>Aider à formuler des appréciations</span></div>
+      <div class="pos-item"><span class="pos-icon">🗂️</span><span>Structurer un projet écrit ou une séquence</span></div>
+    </div>
+    <div class="pos-col">
+      <h3 style="color:var(--error);">❌ L&apos;IA ne remplace pas...</h3>
+      <div class="pos-item"><span class="pos-icon">👁️</span><span>L&apos;observation fine des élèves en classe</span></div>
+      <div class="pos-item"><span class="pos-icon">❤️</span><span>La relation de confiance enseignant-élève</span></div>
+      <div class="pos-item"><span class="pos-icon">🧠</span><span>Le jugement pédagogique et didactique</span></div>
+      <div class="pos-item"><span class="pos-icon">🎯</span><span>L&apos;adaptation en temps réel en classe</span></div>
+      <div class="pos-item"><span class="pos-icon">✅</span><span>La vérification et la validation du contenu</span></div>
+      <div class="pos-item"><span class="pos-icon">🏛️</span><span>La responsabilité éducative et éthique</span></div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(2)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(4)">Suivant : Limites et vigilances ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 5 : LIMITES ===== -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <div class="section-tag">Module 5 — Savoirs notionnels</div>
+    <h1>Limites et points de vigilance</h1>
+    <p class="lead">Utiliser l&apos;IA en professionnel, c&apos;est aussi connaître ses limites pour ne pas être pris en défaut.</p>
+  </div>
+
+  <div class="limit-grid">
+    <div class="limit-card">
+      <div class="limit-icon">🌀</div>
+      <div class="limit-title">Hallucinations</div>
+      <div class="limit-text">L&apos;IA peut inventer des faits, des dates, des auteurs, des citations avec une apparence de certitude. Ne jamais diffuser aux élèves sans vérification, surtout sur des contenus factuels.</div>
+    </div>
+    <div class="limit-card">
+      <div class="limit-icon">📅</div>
+      <div class="limit-title">Données non à jour</div>
+      <div class="limit-text">La connaissance de l&apos;IA a une date de coupure. Sur des sujets d&apos;actualité (réformes, programmes récents, événements), elle peut être dépassée.</div>
+    </div>
+    <div class="limit-card">
+      <div class="limit-icon">🔒</div>
+      <div class="limit-title">Confidentialité des données</div>
+      <div class="limit-text">Ne jamais saisir de données personnelles d&apos;élèves (noms, résultats, situations familiales) dans une IAG. Les conditions d&apos;utilisation varient selon les outils — privilégier les solutions conformes RGPD.</div>
+    </div>
+    <div class="limit-card">
+      <div class="limit-icon">⚖️</div>
+      <div class="limit-title">Biais et représentations</div>
+      <div class="limit-text">L&apos;IA reproduit les biais présents dans ses données d&apos;entraînement (genre, culture, ethnocentrisme). Un regard critique sur les représentations produites reste nécessaire.</div>
+    </div>
+    <div class="limit-card">
+      <div class="limit-icon">©️</div>
+      <div class="limit-title">Droits d&apos;auteur et propriété intellectuelle</div>
+      <div class="limit-text">Le statut juridique des contenus générés par IA est encore en évolution. Les contenus produits sont généralement libres d&apos;usage, mais certaines IAG sont entraînées sur des œuvres protégées.</div>
+    </div>
+    <div class="limit-card">
+      <div class="limit-icon">🎯</div>
+      <div class="limit-title">Résultats génériques sans guidage</div>
+      <div class="limit-text">Sans prompt précis, l&apos;IA produit des contenus trop généraux, trop longs ou inadaptés. La qualité du résultat dépend directement de la qualité de l&apos;instruction donnée.</div>
+    </div>
+  </div>
+
+  <div class="card card-accent">
+    <h3>🔐 Recommandations pour un usage responsable</h3>
+    <table>
+      <tr><th>Situation</th><th>Recommandation</th></tr>
+      <tr><td>Utilisation avec données d&apos;élèves</td><td>Utiliser des données anonymisées uniquement. Préférer <strong>Le Chat de Mistral</strong> (hébergement européen, RGPD).</td></tr>
+      <tr><td>Contenus factuels (dates, lois, sciences)</td><td>Vérifier systématiquement dans une source de référence avant usage.</td></tr>
+      <tr><td>Contenus diffusés aux élèves</td><td>Toujours relire, corriger, valider — l&apos;enseignant signe de son nom pédagogique.</td></tr>
+      <tr><td>Appréciations de bulletins</td><td>L&apos;IA aide à formuler, l&apos;enseignant adapte et signe : la responsabilité reste la sienne.</td></tr>
+      <tr><td>Questions éthiques ou sensibles</td><td>Ne pas déléguer à l&apos;IA les réponses à des situations éducatives complexes impliquant des élèves.</td></tr>
+    </table>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(3)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(5)">Suivant : Ma posture ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 6 : POSTURE ===== -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <div class="section-tag">Module 6 — Réflexion personnelle</div>
+    <h1>Ma posture face à l&apos;IA</h1>
+    <p class="lead">L&apos;IA génère des réactions très diverses chez les enseignants. Avant d&apos;aller plus loin, prenez le temps de situer votre propre positionnement.</p>
+  </div>
+
+  <div class="thermometre-wrap">
+    <div class="thermo-question">1. Globalement, comment décririez-vous votre rapport actuel à l&apos;IA générative ?</div>
+    <div class="thermo-scale">
+      <div class="thermo-opt t1" onclick="selectThermo(1,this)">Méfiance</div>
+      <div class="thermo-opt t2" onclick="selectThermo(1,this)">Scepticisme</div>
+      <div class="thermo-opt t3" onclick="selectThermo(1,this)">Neutre</div>
+      <div class="thermo-opt t4" onclick="selectThermo(1,this)">Intérêt</div>
+      <div class="thermo-opt t5" onclick="selectThermo(1,this)">Enthousiasme</div>
+    </div>
+    <div class="thermo-labels"><span>Je ne lui fais pas confiance</span><span>Je suis prêt(e) à explorer</span></div>
+  </div>
+
+  <div class="thermometre-wrap">
+    <div class="thermo-question">2. Avez-vous déjà utilisé une IAG dans un contexte professionnel (préparation de cours, rédaction, recherche) ?</div>
+    <div class="thermo-scale">
+      <div class="thermo-opt t1" onclick="selectThermo(2,this)">Jamais</div>
+      <div class="thermo-opt t2" onclick="selectThermo(2,this)">1-2 fois</div>
+      <div class="thermo-opt t3" onclick="selectThermo(2,this)">Quelques fois</div>
+      <div class="thermo-opt t4" onclick="selectThermo(2,this)">Régulièrement</div>
+      <div class="thermo-opt t5" onclick="selectThermo(2,this)">Très souvent</div>
+    </div>
+    <div class="thermo-labels"><span>Aucune expérience</span><span>Usage fréquent</span></div>
+  </div>
+
+  <div class="thermometre-wrap">
+    <div class="thermo-question">3. Dans votre établissement, quel est le climat général autour de l&apos;IA ?</div>
+    <div class="thermo-scale">
+      <div class="thermo-opt t1" onclick="selectThermo(3,this)">Rejet</div>
+      <div class="thermo-opt t2" onclick="selectThermo(3,this)">Ignorance</div>
+      <div class="thermo-opt t3" onclick="selectThermo(3,this)">Mitigé</div>
+      <div class="thermo-opt t4" onclick="selectThermo(4,this)">Ouverture</div>
+      <div class="thermo-opt t5" onclick="selectThermo(3,this)">Adoption</div>
+    </div>
+    <div class="thermo-labels"><span>Sujet tabou</span><span>Sujet de travail collectif</span></div>
+  </div>
+
+  <h2>Les 3 postures types — et leurs risques</h2>
+  <div class="notion-grid">
+    <div class="notion-card" data-icon="🚫">
+      <h3 style="color:#ff6b6b;">Le refus</h3>
+      <p>« Je n&apos;en veux pas dans ma classe. » Posture légitime, mais qui risque de laisser les élèves sans accompagnement critique face à un outil qu&apos;ils utilisent déjà.</p>
+    </div>
+    <div class="notion-card" data-icon="🤖">
+      <h3 style="color:#ffd700;">La délégation totale</h3>
+      <p>« L&apos;IA fait tout, je valide. » Risque de perte de compétence professionnelle, de diffusion d&apos;erreurs, et d&apos;uniformisation des contenus pédagogiques.</p>
+    </div>
+    <div class="notion-card" data-icon="🧑‍🏫">
+      <h3 style="color:#51cf66;">L&apos;usage éclairé</h3>
+      <p>L&apos;enseignant définit la tâche, guide l&apos;IA, vérifie le résultat et garde la maîtrise pédagogique. L&apos;IA est un outil parmi d&apos;autres, pas une finalité.</p>
+    </div>
+  </div>
+
+  <div class="card card-blue">
+    <h3>💬 Pour aller plus loin : questions de réflexion collective</h3>
+    <ul style="list-style:none; font-size:13px; line-height:2;">
+      <li>→ Quelle tâche de préparation vous prend le plus de temps ? L&apos;IA pourrait-elle vous aider dessus ?</li>
+      <li>→ Quelles sont les tâches où votre expertise disciplinaire est irremplaçable ?</li>
+      <li>→ Que faire si un élève utilise l&apos;IA pour rendre un devoir ? Comment intégrer cela dans votre évaluation ?</li>
+      <li>→ Comment expliquer à vos élèves ce qu&apos;est l&apos;IA et comment en faire un usage responsable ?</li>
+    </ul>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(4)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(6)">Suivant : Activités ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 7 : ACTIVITÉS ===== -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <div class="section-tag">Module 7 — Activités de compréhension</div>
+    <h1>Testez votre compréhension</h1>
+    <p class="lead">Trois activités pour ancrer les notions vues dans les modules précédents.</p>
+  </div>
+
+  <!-- ACTIVITÉ 1 : QCM -->
+  <div class="card" style="margin-bottom:28px;">
+    <h3>Activité 1 — QCM : Identifiez le bon usage</h3>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Pour chaque situation, choisissez la réponse la plus appropriée.</p>
+
+    <p style="font-size:13px; font-weight:600; margin-bottom:10px;">Q1 — Un professeur de CE2 veut créer un texte de lecture sur le thème de l&apos;automne avec le son [on]. Il doit :</p>
+    <div id="qcm1_opts">
+      <div class="mcq-option" onclick="selectMCQ(1,'a','a')"><div class="mcq-letter">a</div>Chercher dans son manuel un texte qui convient exactement</div>
+      <div class="mcq-option" onclick="selectMCQ(1,'a','b')"><div class="mcq-letter">b</div>Demander à l&apos;IA de générer un texte avec ces contraintes précises, puis le relire</div>
+      <div class="mcq-option" onclick="selectMCQ(1,'a','c')"><div class="mcq-letter">c</div>Copier un texte trouvé sur Internet</div>
+    </div>
+    <div id="qcm1_fb" class="feedback-block"></div>
+
+    <hr>
+    <p style="font-size:13px; font-weight:600; margin-bottom:10px;">Q2 — Un professeur de 3e veut évaluer un devoir sur table. Il peut utiliser l&apos;IA pour :</p>
+    <div id="qcm2_opts">
+      <div class="mcq-option" onclick="selectMCQ(2,'b','a')"><div class="mcq-letter">a</div>Noter automatiquement les copies des élèves</div>
+      <div class="mcq-option" onclick="selectMCQ(2,'b','b')"><div class="mcq-letter">b</div>Préparer une grille de critères avec barème, qu&apos;il adaptera ensuite</div>
+      <div class="mcq-option" onclick="selectMCQ(2,'b','c')"><div class="mcq-letter">c</div>Saisir les productions des élèves pour avoir une correction automatique</div>
+    </div>
+    <div id="qcm2_fb" class="feedback-block"></div>
+
+    <hr>
+    <p style="font-size:13px; font-weight:600; margin-bottom:10px;">Q3 — Un professeur d&apos;anglais veut utiliser une IAG en toute sécurité avec des données d&apos;élèves. Il doit :</p>
+    <div id="qcm3_opts">
+      <div class="mcq-option" onclick="selectMCQ(3,'c','a')"><div class="mcq-letter">a</div>Saisir les données avec des pseudonymes</div>
+      <div class="mcq-option" onclick="selectMCQ(3,'c','b')"><div class="mcq-letter">b</div>Utiliser n&apos;importe quelle IAG car elles sont toutes protégées</div>
+      <div class="mcq-option" onclick="selectMCQ(3,'c','c')"><div class="mcq-letter">c</div>Ne jamais saisir de données personnelles d&apos;élèves dans une IAG, et préférer les solutions conformes RGPD</div>
+    </div>
+    <div id="qcm3_fb" class="feedback-block"></div>
+  </div>
+
+  <!-- ACTIVITÉ 2 : ASSOCIATION USAGES / PLUS-VALUES -->
+  <div class="card" style="margin-bottom:28px;">
+    <h3>Activité 2 — Association : Usage → Plus-value principale</h3>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Reliez chaque usage à la plus-value qu&apos;il apporte en priorité en cliquant sur la bonne colonne.</p>
+    <div style="overflow-x:auto;">
+      <table id="asso-table">
+        <tr>
+          <th>Usage de l&apos;IA</th>
+          <th>Votre choix</th>
+        </tr>
+        <tr>
+          <td>Réécrire une consigne de maths en 3 niveaux</td>
+          <td>
+            <select class="asso-sel" id="ass1" style="font-size:12px; padding:6px; width:100%; border:1.5px solid var(--border); border-radius:3px;">
+              <option value="">— Choisir —</option>
+              <option value="diff">Différenciation pédagogique</option>
+              <option value="temps">Gain de temps</option>
+              <option value="varie">Diversification des contenus</option>
+              <option value="forme">Amélioration rédactionnelle</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Rédiger 28 appréciations de bulletin en partant de mots-clés</td>
+          <td>
+            <select class="asso-sel" id="ass2" style="font-size:12px; padding:6px; width:100%; border:1.5px solid var(--border); border-radius:3px;">
+              <option value="">— Choisir —</option>
+              <option value="diff">Différenciation pédagogique</option>
+              <option value="temps">Gain de temps</option>
+              <option value="varie">Diversification des contenus</option>
+              <option value="forme">Amélioration rédactionnelle</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Générer 8 exercices de proportionnalité dans des contextes sportifs, culinaires et musicaux</td>
+          <td>
+            <select class="asso-sel" id="ass3" style="font-size:12px; padding:6px; width:100%; border:1.5px solid var(--border); border-radius:3px;">
+              <option value="">— Choisir —</option>
+              <option value="diff">Différenciation pédagogique</option>
+              <option value="temps">Gain de temps</option>
+              <option value="varie">Diversification des contenus</option>
+              <option value="forme">Amélioration rédactionnelle</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>Reformuler un courrier aux familles pour le rendre plus clair et bienveillant</td>
+          <td>
+            <select class="asso-sel" id="ass4" style="font-size:12px; padding:6px; width:100%; border:1.5px solid var(--border); border-radius:3px;">
+              <option value="">— Choisir —</option>
+              <option value="diff">Différenciation pédagogique</option>
+              <option value="temps">Gain de temps</option>
+              <option value="varie">Diversification des contenus</option>
+              <option value="forme">Amélioration rédactionnelle</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="asso2_fb" class="feedback-block"></div>
+    <div class="btn-group">
+      <button class="btn btn-primary btn-sm" onclick="checkAsso2()">Vérifier</button>
+    </div>
+  </div>
+
+  <!-- ACTIVITÉ 3 : SCÉNARIO À ANALYSER -->
+  <div class="card">
+    <h3>Activité 3 — Scénario : Bon ou mauvais usage ?</h3>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Lisez chaque scénario et indiquez s&apos;il représente un <strong>usage approprié</strong>, <strong>à améliorer</strong> ou <strong>problématique</strong>.</p>
+
+    <div class="vf-item">
+      <strong>Scénario A :</strong> Mme Durand, professeure de 6e, génère avec l&apos;IA une fiche de révision sur les fractions. Elle la relit, corrige deux erreurs, et la distribue le lendemain.
+      <div class="vf-buttons">
+        <button class="vf-btn vrai" onclick="answerScenario('A','ok')">✅ Approprié</button>
+        <button class="vf-btn" style="color:var(--warn);border-color:var(--warn);" onclick="answerScenario('A','moyen')">⚠️ À améliorer</button>
+        <button class="vf-btn faux" onclick="answerScenario('A','ko')">❌ Problématique</button>
+      </div>
+      <div id="scA_fb" class="vf-feedback"></div>
+    </div>
+
+    <div class="vf-item">
+      <strong>Scénario B :</strong> M. Bernard, professeur d&apos;histoire en 4e, saisit dans ChatGPT les noms, prénoms et résultats aux devoirs de tous ses élèves pour générer des commentaires personnalisés.
+      <div class="vf-buttons">
+        <button class="vf-btn vrai" onclick="answerScenario('B','ok')">✅ Approprié</button>
+        <button class="vf-btn" style="color:var(--warn);border-color:var(--warn);" onclick="answerScenario('B','moyen')">⚠️ À améliorer</button>
+        <button class="vf-btn faux" onclick="answerScenario('B','ko')">❌ Problématique</button>
+      </div>
+      <div id="scB_fb" class="vf-feedback"></div>
+    </div>
+
+    <div class="vf-item">
+      <strong>Scénario C :</strong> Mme Leroy, professeure de SVT au lycée, demande à l&apos;IA de rédiger entièrement sa séquence de cours sur la génétique, et la diffuse sans la relire car elle fait confiance au résultat.
+      <div class="vf-buttons">
+        <button class="vf-btn vrai" onclick="answerScenario('C','ok')">✅ Approprié</button>
+        <button class="vf-btn" style="color:var(--warn);border-color:var(--warn);" onclick="answerScenario('C','moyen')">⚠️ À améliorer</button>
+        <button class="vf-btn faux" onclick="answerScenario('C','ko')">❌ Problématique</button>
+      </div>
+      <div id="scC_fb" class="vf-feedback"></div>
+    </div>
+
+    <div class="vf-item">
+      <strong>Scénario D :</strong> M. Petit, professeur d&apos;EPS en collège, n&apos;utilise jamais l&apos;IA mais demande à l&apos;IA de lui générer un résumé des arguments pédagogiques pour ou contre l&apos;évaluation par compétences. Il utilise cela pour préparer une discussion en conseil pédagogique.
+      <div class="vf-buttons">
+        <button class="vf-btn vrai" onclick="answerScenario('D','ok')">✅ Approprié</button>
+        <button class="vf-btn" style="color:var(--warn);border-color:var(--warn);" onclick="answerScenario('D','moyen')">⚠️ À améliorer</button>
+        <button class="vf-btn faux" onclick="answerScenario('D','ko')">❌ Problématique</button>
+      </div>
+      <div id="scD_fb" class="vf-feedback"></div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(5)">‹ Retour</button>
+    <button class="btn btn-primary" onclick="goTo(7)">Voir mon bilan ›</button>
+  </div>
+</div>
+
+<!-- ===== MODULE 8 : BILAN ===== -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <div class="section-tag">Module 8 — Synthèse</div>
+    <h1>Bilan &amp; mémo</h1>
+    <p class="lead">Les points essentiels à retenir.</p>
+  </div>
+
+  <h2>Les 6 messages clés</h2>
+  <div class="card" style="background:var(--ink); color:var(--paper);">
+    <ul class="principe-list">
+      <li>
+        <div class="principe-num">🎯</div>
+        <div><strong style="color:var(--accent);">L&apos;IA est un outil, pas un oracle</strong><span style="color:#ccc;">Elle produit du texte vraisemblable, pas forcément exact. La vérification par l&apos;enseignant est toujours nécessaire avant tout usage en classe.</span></div>
+      </li>
+      <li>
+        <div class="principe-num">⏱</div>
+        <div><strong style="color:var(--accent);">Elle libère du temps sur les tâches répétitives</strong><span style="color:#ccc;">Exercices variés, appréciations, fiches de révision, différenciation — autant de tâches chronophages où l&apos;IA offre un gain réel.</span></div>
+      </li>
+      <li>
+        <div class="principe-num">🧑‍🏫</div>
+        <div><strong style="color:var(--accent);">L&apos;expertise pédagogique reste irremplaçable</strong><span style="color:#ccc;">Observation des élèves, relation éducative, jugement didactique, adaptation en temps réel : aucune IA ne peut s&apos;y substituer.</span></div>
+      </li>
+      <li>
+        <div class="principe-num">🔒</div>
+        <div><strong style="color:var(--accent);">Jamais de données personnelles d&apos;élèves</strong><span style="color:#ccc;">Noms, résultats, situations personnelles ne doivent pas être saisis dans une IAG. Préférer les solutions conformes RGPD.</span></div>
+      </li>
+      <li>
+        <div class="principe-num">🎛️</div>
+        <div><strong style="color:var(--accent);">La qualité du résultat dépend de la qualité de la demande</strong><span style="color:#ccc;">Plus l&apos;instruction est précise (niveau, format, discipline, contraintes), meilleur est le résultat. C&apos;est l&apos;objet du module suivant.</span></div>
+      </li>
+      <li>
+        <div class="principe-num">⚖️</div>
+        <div><strong style="color:var(--accent);">Une posture critique et éclairée</strong><span style="color:#ccc;">Ni rejet systématique, ni délégation totale : l&apos;enseignant garde la maîtrise pédagogique et éthique de ce qu&apos;il produit.</span></div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-outline" onclick="goTo(6)">‹ Retour aux activités</button>
+    <button class="btn btn-primary" onclick="goTo(0)">↺ Recommencer</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+let doneModules = new Set([0,1]);
+
+function goTo(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.remove('active');
+    if(doneModules.has(i) && i !== n) t.classList.add('done'); else t.classList.remove('done');
+  });
+  document.getElementById('tab'+n).classList.add('active');
+  doneModules.add(n);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Scénario tabs
+function showScenario(id) {
+  document.querySelectorAll('.scenario-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sc-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Vrai/Faux
+const vfAnswers = {
+  1: { correct: 'faux', ok: "✅ Faux ! L&apos;IA peut se tromper avec assurance : elle invente des faits, des citations, des dates. C&apos;est ce qu&apos;on appelle les hallucinations. La vérification reste toujours indispensable.", ko: "❌ Pas tout à fait. L&apos;IA produit du texte vraisemblable, pas forcément exact. Elle peut inventer des références ou des faits (hallucinations) avec une apparence de certitude." },
+  2: { correct: 'faux', ok: "✅ Faux ! Utiliser l&apos;IA pour préparer ses cours, c&apos;est comme utiliser un traitement de texte ou un projecteur : un outil professionnel au service de l&apos;enseignement. Ce qui compte, c&apos;est la vérification et la maîtrise du contenu final.", ko: "❌ Non. Utiliser l&apos;IA pour préparer ses cours n&apos;est pas de la triche : c&apos;est un outil professionnel, comme le traitement de texte. La responsabilité reste celle de l&apos;enseignant qui vérifie et valide." },
+  3: { correct: 'faux', ok: "✅ Faux ! L&apos;IA ne peut pas remplacer la relation éducative, l&apos;observation fine des élèves, l&apos;adaptation en temps réel et le jugement pédagogique. Elle peut assister, pas substituer.", ko: "❌ Non. L&apos;IA peut produire du contenu, mais elle ne perçoit pas les élèves, ne les motive pas, ne résout pas les conflits, ne connaît pas l&apos;histoire de la classe. La relation humaine est irremplaçable." },
+  4: { correct: 'faux', ok: "✅ Faux ! L&apos;IA ne connaît pas vos élèves. C&apos;est vous qui lui donnez le contexte dans votre prompt (niveau, pré-requis, difficultés). Elle adapte le contenu à ce que vous lui décrivez, pas à une connaissance réelle des élèves.", ko: "❌ Non. L&apos;IA ne connaît pas vos élèves. Elle adapte le contenu uniquement selon le contexte que vous lui fournissez dans votre instruction. C&apos;est l&apos;enseignant qui décrit le profil." },
+  5: { correct: 'vrai', ok: "✅ Vrai, en partie ! Cela dépend de l&apos;outil et de ses conditions d&apos;utilisation. Certaines IAG utilisent les conversations pour améliorer leurs modèles. C&apos;est pourquoi il ne faut jamais saisir de données personnelles d&apos;élèves. Préférer des solutions RGPD.", ko: "❌ C&apos;est partiellement vrai. Certaines IAG peuvent utiliser vos données pour entraîner leurs modèles. Les conditions varient selon l&apos;outil. D&apos;où l&apos;importance de ne jamais saisir de données personnelles d&apos;élèves." },
+  6: { correct: 'faux', ok: "✅ Faux ! L&apos;IA intègre une part de variabilité dans ses réponses. Deux formulations identiques peuvent produire des résultats légèrement différents. C&apos;est une caractéristique, pas un bug — elle peut même être un avantage pour obtenir des variantes.", ko: "❌ Non. L&apos;IA génère ses réponses avec une certaine variabilité. La même question posée deux fois peut donner deux réponses différentes. C&apos;est utile pour obtenir des variantes d&apos;un même exercice." },
+  7: { correct: 'vrai', ok: "✅ Vrai ! C&apos;est précisément l&apos;une des plus-values majeures : générer des séries d&apos;exercices, des variantes, des fiches de révision — des tâches qui prennent du temps sans nécessiter de jugement pédagogique à chaque instant.", ko: "❌ Si, absolument. Générer des exercices variés, des fiches de révision, des appréciations — ce sont des tâches répétitives et chronophages où l&apos;IA apporte un gain de temps réel." }
+};
+
+let vfScore = 0;
+let vfAnswered = {};
+
+function answerVF(num, answer) {
+  if(vfAnswered[num]) return;
+  vfAnswered[num] = answer;
+  const data = vfAnswers[num];
+  const fb = document.getElementById('vf'+num+'_fb');
+  const btns = document.querySelectorAll('#vf'+num+' .vf-btn');
+  btns.forEach(b => b.style.opacity='0.4');
+  if(answer === data.correct) {
+    fb.className='vf-feedback vf-ok visible';
+    fb.innerHTML = data.ok;
+    vfScore++;
+    btns.forEach(b => { if(b.textContent.toLowerCase().includes(answer)) { b.classList.add('active'); b.style.opacity='1'; } });
+  } else {
+    fb.className='vf-feedback vf-ko visible';
+    fb.innerHTML = data.ko;
+    btns.forEach(b => { if(b.textContent.toLowerCase().includes(answer)) { b.classList.add('active'); b.style.opacity='1'; } });
+  }
+  if(Object.keys(vfAnswered).length === 7) {
+    const sf = document.getElementById('vf_score');
+    sf.className = 'feedback-block visible ' + (vfScore >= 5 ? 'feedback-ok' : 'feedback-ko');
+    sf.innerHTML = vfScore+'/7 bonnes réponses. '+(vfScore>=6?'Excellent ! Vous avez une bonne représentation de l&apos;IA.':vfScore>=4?'Bien ! Quelques représentations à préciser.':'Plusieurs idées reçues à déconstruire — les modules suivants vont vous y aider.');
+  }
+}
+
+// Thermomètre
+function selectThermo(num, el) {
+  const wrap = el.closest('.thermometre-wrap');
+  wrap.querySelectorAll('.thermo-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// QCM activité 1
+const mcqData = {
+  1: { correct:'b', ok:"✅ Exact ! L&apos;IA peut générer un texte parfaitement calibré (son ciblé, thème, longueur, niveau de langue) en quelques secondes. L&apos;enseignant relit et valide avant distribution.", ko:"❌ La meilleure option est de demander à l&apos;IA de générer un texte avec ces contraintes précises, puis de le relire. C&apos;est plus rapide que la recherche manuelle et évite les problèmes de droits." },
+  2: { correct:'b', ok:"✅ Exact ! L&apos;IA peut aider à préparer une grille de critères, que l&apos;enseignant adapte ensuite. La notation des copies reste une responsabilité professionnelle de l&apos;enseignant.", ko:"❌ L&apos;IA ne peut pas noter des copies réelles (surtout avec des données d&apos;élèves). Elle peut aider à préparer des outils d&apos;évaluation (grilles, corrigés-types) que l&apos;enseignant utilisera." },
+  3: { correct:'c', ok:"✅ Exact ! Ne jamais saisir de données personnelles d&apos;élèves dans une IAG. Les pseudonymes ne suffisent pas si d&apos;autres données permettent l&apos;identification. Préférer les solutions certifiées RGPD.", ko:"❌ La bonne pratique est de ne jamais saisir de données personnelles d&apos;élèves dans une IAG, quelle que soit la solution, et de privilégier les outils conformes RGPD (comme Le Chat de Mistral)." }
+};
+let mcqAnswered = {};
+function selectMCQ(qnum, correct, chosen) {
+  if(mcqAnswered[qnum]) return;
+  mcqAnswered[qnum] = chosen;
+  const opts = document.getElementById('qcm'+qnum+'_opts').querySelectorAll('.mcq-option');
+  opts.forEach(o => o.classList.remove('selected','correct','wrong'));
+  const letters = ['a','b','c','d'];
+  opts[letters.indexOf(chosen)].classList.add('selected');
+  const fb = document.getElementById('qcm'+qnum+'_fb');
+  const data = mcqData[qnum];
+  if(chosen === data.correct) {
+    opts[letters.indexOf(chosen)].classList.add('correct');
+    fb.className='feedback-block feedback-ok visible';
+    fb.innerHTML = data.ok;
+  } else {
+    opts[letters.indexOf(chosen)].classList.add('wrong');
+    fb.className='feedback-block feedback-ko visible';
+    fb.innerHTML = data.ko;
+  }
+}
+
+// Association activité 2
+function checkAsso2() {
+  const a1=document.getElementById('ass1').value;
+  const a2=document.getElementById('ass2').value;
+  const a3=document.getElementById('ass3').value;
+  const a4=document.getElementById('ass4').value;
+  let score=0;
+  if(a1==='diff') score++;
+  if(a2==='temps') score++;
+  if(a3==='varie') score++;
+  if(a4==='forme') score++;
+  const fb=document.getElementById('asso2_fb');
+  if(score===4) {
+    fb.className='feedback-block feedback-ok visible';
+    fb.innerHTML='✅ Parfait ! (1) Réécrire une consigne en 3 niveaux → Différenciation. (2) 28 appréciations depuis mots-clés → Gain de temps. (3) 8 exercices contextes variés → Diversification des contenus. (4) Reformuler un courrier → Amélioration rédactionnelle.';
+  } else {
+    fb.className='feedback-block feedback-ko visible';
+    fb.innerHTML=score+'/4 correct(s). Réponses attendues : (1) Différenciation pédagogique, (2) Gain de temps, (3) Diversification des contenus, (4) Amélioration rédactionnelle.';
+  }
+}
+
+// Scénarios activité 3
+const scenarioData = {
+  A: { correct:'ok', ok:"✅ Usage approprié ! Générer avec l&apos;IA, relire, corriger les erreurs, valider : c&apos;est la posture professionnelle idéale. L&apos;enseignante garde la maîtrise du contenu.", moyen:"Presque ! Ce scénario décrit en fait un usage parfaitement approprié : génération + vérification + correction. C&apos;est exactement la bonne démarche.", ko:"Non, ce scénario décrit un usage exemplaire : l&apos;enseignante génère, relit et corrige avant de distribuer. C&apos;est la bonne posture." },
+  B: { correct:'ko', ok:"❌ Ce scénario est problématique ! Saisir noms, prénoms et résultats d&apos;élèves dans ChatGPT est une violation des règles RGPD. Les données personnelles d&apos;élèves ne doivent jamais être transmises à une IAG externe.", moyen:"C&apos;est plus que 'à améliorer' : c&apos;est problématique. Saisir des données personnelles d&apos;élèves (noms, résultats) dans une IAG externe est une violation des règles RGPD applicables dans l&apos;éducation.", ko:"✅ Exact ! Saisir noms, prénoms et résultats dans une IAG externe est une violation des règles RGPD. La solution : travailler avec des données anonymisées, et préférer des outils conformes RGPD." },
+  C: { correct:'ko', ok:"❌ C&apos;est problématique. Diffuser sans relire un contenu IA en sciences peut exposer les élèves à des erreurs, des imprécisions, voire des hallucinations. La vérification est toujours nécessaire.", moyen:"C&apos;est plus que 'à améliorer'. Diffuser sans relire un contenu IA — surtout en SVT où la précision factuelle est cruciale — est risqué. L&apos;enseignante engage sa responsabilité professionnelle.", ko:"✅ Exact ! Diffuser sans relire un contenu généré par IA est problématique. L&apos;IA peut contenir des erreurs ou hallucinations. L&apos;enseignante engage sa responsabilité sur ce qu&apos;elle distribue à ses élèves." },
+  D: { correct:'ok', ok:"✅ Usage approprié ! Utiliser l&apos;IA comme outil de synthèse d&apos;arguments pour préparer une discussion professionnelle est un usage tout à fait pertinent — à condition de vérifier les points importants avant la réunion.", moyen:"C&apos;est en réalité un usage approprié. L&apos;enseignant utilise l&apos;IA comme outil de synthèse, sans données personnelles, dans un cadre de réflexion professionnelle. Il lui reste à vérifier les arguments clés.", ko:"Non, c&apos;est un usage approprié et astucieux. L&apos;enseignant utilise l&apos;IA pour se préparer à un débat professionnel — sans données personnelles, avec une approche critique." }
+};
+let scenarioAnswered = {};
+function answerScenario(id, answer) {
+  if(scenarioAnswered[id]) return;
+  scenarioAnswered[id] = answer;
+  const data = scenarioData[id];
+  const fb = document.getElementById('sc'+id+'_fb');
+  if(answer === data.correct) {
+    fb.className='vf-feedback vf-ok visible';
+    fb.innerHTML = data[answer];
+  } else {
+    fb.className='vf-feedback vf-ko visible';
+    fb.innerHTML = data[answer];
+  }
+}
+</script>
+</body>
+</html>
